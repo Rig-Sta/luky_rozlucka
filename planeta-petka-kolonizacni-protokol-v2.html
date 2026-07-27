@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>planeta-petka-kolonizacni-protokol-v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=zodiak@400,700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
+      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+      --text-base:clamp(1rem,.95rem + .25vw,1.08rem);
+      --text-lg:clamp(1.125rem,1rem + .75vw,1.4rem);
+      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+      --bg:#07111f;--surface:rgba(12,20,36,.8);--surface-2:rgba(17,28,48,.9);--surface-3:rgba(24,37,62,.95);
+      --border:rgba(220,232,255,.12);--line:rgba(136,162,214,.34);--text:#edf3ff;--muted:#a5b4d5;--faint:#7382a3;
+      --accent:#79e0cf;--accent-2:#7f9df1;--gold:#f0c971;--gold-2:#ffefaf;--locked:#5d6883;--success:#dba848;
+      --radius-sm:.5rem;--radius-md:.9rem;--radius-lg:1.25rem;--shadow:0 18px 44px rgba(0,0,0,.33);
+      --font-body:'General Sans',Inter,system-ui,sans-serif;--font-display:'Zodiak',Georgia,serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    body{min-height:100vh;font-family:var(--font-body);font-size:var(--text-base);line-height:1.6;color:var(--text);background:
+      radial-gradient(circle at 15% 18%, rgba(52,92,163,.36), transparent 24%),
+      radial-gradient(circle at 82% 10%, rgba(32,115,112,.22), transparent 18%),
+      linear-gradient(180deg,#08101d 0%,#050913 100%);
+    }
+    body:before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.28;background-image:radial-gradient(2px 2px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 100px 80px,#fff,transparent),radial-gradient(1px 1px at 160px 20px,#fff,transparent),radial-gradient(2px 2px at 240px 120px,rgba(255,255,255,.65),transparent);background-size:280px 180px}
+    .wrap{max-width:1320px;margin:0 auto;padding:var(--space-8) var(--space-4) var(--space-16)}
+    .skip{position:absolute;left:-9999px}.skip:focus{left:1rem;top:1rem;z-index:30;background:#fff;color:#000;padding:.75rem 1rem;border-radius:.5rem}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4);margin-bottom:var(--space-8)}
+    .eyebrow{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.22em;color:var(--accent)}
+    h1{font-family:var(--font-display);font-size:clamp(2.2rem,4vw,3.8rem);line-height:.98;margin-top:.2rem}
+    .lead{max-width:60ch;color:var(--muted);margin-top:var(--space-3)}
+    .theme{min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text)}
+    .layout{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-6);align-items:start}
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+    .network{padding:var(--space-6);overflow:auto}
+    .tasks{padding:var(--space-6)}
+    h2{font-size:var(--text-lg);margin-bottom:var(--space-4)}
+    .legend{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-5)}
+    .chip{padding:.45rem .8rem;border-radius:999px;border:1px solid var(--border);font-size:var(--text-xs);color:var(--muted);background:rgba(255,255,255,.03)}
+    .chip.done{background:rgba(240,201,113,.14);color:var(--gold-2);border-color:rgba(240,201,113,.35)}
+    .chip.ready{background:rgba(121,224,207,.09);color:#dffcf6;border-color:rgba(121,224,207,.25)}
+    .chip.locked{background:rgba(125,137,168,.08);color:#8d97af;border-color:rgba(125,137,168,.18)}
+    .map-shell{min-width:740px;padding:var(--space-4);border-radius:calc(var(--radius-lg) - .4rem);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.04)}
+    .map-svg{width:100%;height:auto;display:block}
+    .hex{cursor:pointer;transition:transform .18s ease, filter .18s ease}
+    .hex:hover{transform:translateY(-3px)}
+    .hex polygon.main{stroke-width:2;transition:fill .18s ease, stroke .18s ease, filter .18s ease}
+    .hex text.num{font-size:18px;font-weight:700;letter-spacing:.06em}
+    .hex text.label{font-size:13px;font-weight:600}
+    .hex.done polygon.main{fill:url(#goldFill);stroke:#ffe7a1;filter:url(#goldGlow)}
+    .hex.done text{fill:#211300}
+    .hex.ready polygon.main{fill:url(#readyFill);stroke:#9beee0}
+    .hex.ready text{fill:#f2fbff}
+    .hex.locked polygon.main{fill:#202b40;stroke:#48536f}
+    .hex.locked text{fill:#7e8aa6}
+    .edge{stroke:rgba(154,176,224,.42);stroke-width:3;fill:none}
+    .edge.active{stroke:rgba(240,201,113,.58)}
+    .list{display:grid;gap:var(--space-4)}
+    .task{border:1px solid var(--border);border-radius:1.15rem;background:var(--surface-2);padding:var(--space-4);display:grid;grid-template-columns:auto 1fr;gap:var(--space-4);align-items:start}
+    .task.done{background:linear-gradient(180deg,rgba(240,201,113,.16),rgba(240,201,113,.07));border-color:rgba(240,201,113,.32)}
+    .task.ready{background:linear-gradient(180deg,rgba(121,224,207,.08),rgba(255,255,255,.02));border-color:rgba(121,224,207,.2)}
+    .task.locked{background:rgba(255,255,255,.025);border-color:rgba(125,137,168,.14);opacity:.78}
+    .toggle{margin-top:.15rem;appearance:none;width:1.4rem;height:1.4rem;border-radius:.35rem;border:1px solid var(--line);background:#0f1930;display:grid;place-items:center;cursor:pointer;position:relative}
+    .toggle:checked{background:linear-gradient(180deg,var(--gold),#d6a949);border-color:#f3db8f}
+    .toggle:checked::after{content:'✓';position:absolute;color:#241500;font-weight:800;font-size:.95rem;line-height:1}
+    .toggle:disabled{cursor:not-allowed;opacity:.5}
+    .meta{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;margin-bottom:.55rem}
+    .id{font-size:var(--text-xs);letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+    .state{font-size:var(--text-xs);padding:.28rem .55rem;border-radius:999px;border:1px solid var(--border)}
+    .state.done{color:#241500;background:rgba(240,201,113,.94);border-color:rgba(255,234,173,.9)}
+    .state.ready{color:#dffcf6;background:rgba(121,224,207,.12);border-color:rgba(121,224,207,.24)}
+    .state.locked{color:#8d97af;background:rgba(125,137,168,.08);border-color:rgba(125,137,168,.18)}
+    .task h3{font-size:1.05rem;line-height:1.2;margin-bottom:.45rem}
+    .task p{color:var(--muted);max-width:64ch}
+    .req{margin-top:.7rem;font-size:var(--text-xs);color:var(--faint)}
+    @media (max-width:1050px){.layout{grid-template-columns:1fr}.map-shell{min-width:680px}}
+    @media (max-width:760px){.wrap{padding:var(--space-6) var(--space-3) var(--space-10)}.topbar{align-items:flex-start}.network,.tasks{padding:var(--space-4)}.map-shell{min-width:620px}}
+    @media (prefers-reduced-motion:reduce){.hex,.hex polygon.main{transition:none}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#obsah">Přeskočit na obsah</a>
+  <div class="wrap">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">Kolonizační protokol</div>
+        <h1>Planeta Peťka</h1>
+        <p class="lead">Přehled orbitálního střetu, průzkumu, vrtů, infrastruktury a finální expanze kolonie. Jednotlivé fáze lze aktivovat pouze při splnění návazností v síti mise.</p>
+      </div>
+      <button class="theme" data-theme-toggle aria-label="Přepnout režim"></button>
+    </header>
+
+    <main id="obsah" class="layout">
+      <section class="panel network" aria-labelledby="sit-title">
+        <h2 id="sit-title">Síť kolonizačních fází</h2>
+        <div class="legend">
+          <span class="chip done">splněno</span>
+          <span class="chip ready">lze zahájit</span>
+          <span class="chip locked">uzamčeno</span>
+        </div>
+        <div class="map-shell">
+          <svg class="map-svg" viewBox="0 0 940 900" role="img" aria-label="Hexagonová síť úkolů kolonizační mise">
+            <defs>
+              <linearGradient id="readyFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#18374e"/>
+                <stop offset="100%" stop-color="#1e5f60"/>
+              </linearGradient>
+              <linearGradient id="goldFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fff0b4"/>
+                <stop offset="45%" stop-color="#f0c971"/>
+                <stop offset="100%" stop-color="#c78f34"/>
+              </linearGradient>
+              <filter id="goldGlow"><feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#f1cc6f" flood-opacity=".48"/></filter>
+            </defs>
+            <g id="edges"></g>
+            <g id="nodes"></g>
+          </svg>
+        </div>
+      </section>
+
+      <section class="panel tasks" aria-labelledby="ukoly-title">
+        <h2 id="ukoly-title">Výčet fází</h2>
+        <div id="taskList" class="list"></div>
+      </section>
+    </main>
+  </div>
+
+<script>
+const stages = [
+  { id:1, code:'Fáze 01', title:'Vesmírná bitva', story:'Kolonizační flotila dorazila k orbitě planety a narazila na konkurenční výpravy. Přístupový koridor bylo nutné vybojovat v přímém střetu a zajistit bezpečné okno pro další postup.', deps:[], pos:[470,100] },
+  { id:2, code:'Fáze 02', title:'Průzkum terénu', story:'Po poškozeném přiblížení selhala část přístrojů. Posádka musí zmapovat povrch, určit obyvatelnou zónu a vytipovat první bezpečné body pro další pohyb po planetě.', deps:[1], pos:[300,280] },
+  { id:3, code:'Fáze 03', title:'Hloubkový vrt', story:'Skeny podloží naznačují přítomnost skrytého vodního rezervoáru. Těžební tým musí proniknout pod horní vrstvy povrchu a zajistit přístup ke strategickému zdroji.', deps:[1], pos:[640,280] },
+  { id:4, code:'Fáze 04', title:'Expedice po planetě', story:'Po prvotním přežití začíná rozsáhlé mapování krajiny. Výprava hledá další ložiska, bezpečné trasy a sektory vhodné pro dlouhodobé využití.', deps:[2,3], pos:[170,470] },
+  { id:5, code:'Fáze 05', title:'Atmosférická bouře', story:'Místní klima se ukazuje jako nestabilní. Bouře narušuje komunikaci, viditelnost i koordinaci posádky a vyžaduje rychlé zavedení krizových protokolů.', deps:[2,3], pos:[470,470] },
+  { id:6, code:'Fáze 06', title:'Budování infrastruktury', story:'Nouzové přežívání je u konce. Kolonie zahajuje stavbu energetických, zásobovacích a obytných modulů, aby mohla přejít do stabilního provozu.', deps:[2,3], pos:[770,470] },
+  { id:7, code:'Fáze 07', title:'Pozemní transportní síť', story:'Rozptýlené sektory kolonie je třeba propojit rychlými pozemními koridory. Aktivace transportní sítě umožní stabilní pohyb mezi klíčovými uzly osídlení.', deps:[6], pos:[300,660] },
+  { id:8, code:'Fáze 08', title:'Průnik do jádra planety', story:'Hloubkové senzory odhalily skryté centrum planetární struktury. Výzkumný tým musí proniknout do uzavřených zón a dešifrovat vnitřní logiku planety.', deps:[4,5], pos:[640,660] },
+  { id:9, code:'Fáze 09', title:'Rozmnožování obyvatelstva', story:'Po stabilizaci klíčových uzlů přechází kolonie do expanzní fáze. Planetární základna se může proměnit v trvale udržitelný civilizační celek s další generací obyvatel.', deps:[7,8], pos:[470,840] }
+];
+const state = new Map(stages.map(s => [s.id,false]));
+const nodesLayer = document.getElementById('nodes');
+const edgesLayer = document.getElementById('edges');
+const taskList = document.getElementById('taskList');
+const root = document.documentElement;
+function setupTheme(){
+  const btn = document.querySelector('[data-theme-toggle]');
+  let dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  function paint(){
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    btn.innerHTML = dark
+      ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.2M12 19.8V22M4.93 4.93l1.55 1.55M17.52 17.52l1.55 1.55M2 12h2.2M19.8 12H22M4.93 19.07l1.55-1.55M17.52 6.48l1.55-1.55"></path></svg>'
+      : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.6A8.8 8.8 0 1 1 11.4 3a6.9 6.9 0 0 0 9.6 9.6Z"></path></svg>';
+  }
+  btn.addEventListener('click',()=>{dark=!dark;paint();});
+  paint();
+}
+function hexPoints(cx,cy,w=116,h=100){
+  const hw = w/2, hh = h/2, q = w*0.25;
+  return `${cx-q},${cy-hh} ${cx+q},${cy-hh} ${cx+hw},${cy} ${cx+q},${cy+hh} ${cx-q},${cy+hh} ${cx-hw},${cy}`;
+}
+function stageStatus(stage){
+  if(state.get(stage.id)) return 'done';
+  if(stage.deps.length===0) return 'ready';
+  return stage.deps.some(dep=>state.get(dep)) ? 'ready' : 'locked';
+}
+function lineState(from,to){
+  const a = state.get(from), b = state.get(to);
+  return (a || b) ? 'edge active' : 'edge';
+}
+function drawNetwork(){
+  edgesLayer.innerHTML='';
+  nodesLayer.innerHTML='';
+  stages.forEach(stage=>{
+    stage.deps.forEach(dep=>{
+      const parent = stages.find(s=>s.id===dep);
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      const [x1,y1] = parent.pos; const [x2,y2] = stage.pos;
+      const midY = (y1+y2)/2;
+      path.setAttribute('d', `M ${x1} ${y1+54} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2-54}`);
+      path.setAttribute('class', lineState(dep, stage.id));
+      edgesLayer.appendChild(path);
+    });
+  });
+  stages.forEach(stage=>{
+    const [x,y] = stage.pos;
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    const status = stageStatus(stage);
+    g.setAttribute('class', `hex ${status}`);
+    g.setAttribute('tabindex','0');
+    g.setAttribute('role','button');
+    g.setAttribute('aria-label', `${stage.code} ${stage.title}`);
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points', hexPoints(x,y));
+    poly.setAttribute('class','main');
+    const num = document.createElementNS('http://www.w3.org/2000/svg','text');
+    num.setAttribute('x', x); num.setAttribute('y', y-10); num.setAttribute('text-anchor','middle'); num.setAttribute('class','num'); num.textContent = String(stage.id).padStart(2,'0');
+    const label1 = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label1.setAttribute('x', x); label1.setAttribute('y', y+16); label1.setAttribute('text-anchor','middle'); label1.setAttribute('class','label');
+    const words = stage.title.split(' ');
+    const first = words.slice(0, Math.ceil(words.length/2)).join(' ');
+    const second = words.slice(Math.ceil(words.length/2)).join(' ');
+    const t1 = document.createElementNS('http://www.w3.org/2000/svg','tspan'); t1.setAttribute('x',x); t1.setAttribute('dy','0'); t1.textContent = first;
+    label1.appendChild(t1);
+    if(second){ const t2 = document.createElementNS('http://www.w3.org/2000/svg','tspan'); t2.setAttribute('x',x); t2.setAttribute('dy','15'); t2.textContent = second; label1.appendChild(t2); }
+    g.appendChild(poly); g.appendChild(num); g.appendChild(label1);
+    g.addEventListener('click', ()=>focusTask(stage.id));
+    g.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); focusTask(stage.id);} });
+    nodesLayer.appendChild(g);
+  });
+}
+function dependencyText(stage){
+  if(!stage.deps.length) return 'Bez předchozích návazností.';
+  const names = stage.deps.map(id=>stages.find(s=>s.id===id).title).join(' nebo ');
+  return `Lze zahájit po splnění: ${names}.`;
+}
+function renderTasks(){
+  taskList.innerHTML='';
+  stages.forEach(stage=>{
+    const status = stageStatus(stage);
+    const article = document.createElement('article');
+    article.className = `task ${status}`;
+    article.id = `task-${stage.id}`;
+    const canToggle = status !== 'locked';
+    article.innerHTML = `
+      <div>
+        <input class="toggle" type="checkbox" aria-label="Označit ${stage.title} jako splněný" ${state.get(stage.id) ? 'checked' : ''} ${canToggle ? '' : 'disabled'}>
+      </div>
+      <div>
+        <div class="meta">
+          <span class="id">${stage.code}</span>
+          <span class="state ${status}">${status === 'done' ? 'splněno' : status === 'ready' ? 'lze zahájit' : 'uzamčeno'}</span>
+        </div>
+        <h3>${stage.title}</h3>
+        <p>${stage.story}</p>
+        <div class="req">${dependencyText(stage)}</div>
+      </div>`;
+    const toggle = article.querySelector('.toggle');
+    toggle.addEventListener('change', e=>{
+      if(e.target.checked){
+        if(stageStatus(stage)==='locked'){ e.target.checked = false; return; }
+        state.set(stage.id,true);
+      } else {
+        state.set(stage.id,false);
+        cascadeUnlock();
+      }
+      update();
+    });
+    taskList.appendChild(article);
+  });
+}
+function cascadeUnlock(){
+  let changed = true;
+  while(changed){
+    changed = false;
+    stages.forEach(stage=>{
+      if(!state.get(stage.id)) return;
+      if(stage.deps.length && !stage.deps.some(dep=>state.get(dep))){
+        state.set(stage.id,false);
+        changed = true;
+      }
+    });
+  }
+}
+function focusTask(id){
+  document.getElementById(`task-${id}`)?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function update(){
+  cascadeUnlock();
+  drawNetwork();
+  renderTasks();
+}
+setupTheme();
+update();
+</script>
+</body>
+</html>
