@@ -78,8 +78,9 @@
     }
 
     .map-svg{width:100%;height:auto;display:block}
-    .hex{cursor:pointer;transition:transform .18s ease, filter .18s ease}
+    .hex{cursor:pointer;transition:transform .18s ease, filter .18s ease;transform-box:fill-box;transform-origin:center}
     .hex:hover{transform:translateY(-3px)}
+
     .hex polygon.main{stroke-width:2;transition:fill .18s ease, stroke .18s ease, filter .18s ease}
     .hex text.num{font-size:18px;font-weight:700;letter-spacing:.06em}
     .hex text.label{font-size:13px;font-weight:600}
