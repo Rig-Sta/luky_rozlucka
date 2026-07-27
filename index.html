@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>planeta-petka-kolonizacni-protokol-v3-briefing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=zodiak@400,700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
+      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+      --text-base:clamp(1rem,.95rem + .25vw,1.08rem);
+      --text-lg:clamp(1.125rem,1rem + .75vw,1.4rem);
+      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+      --bg:#07111f;--surface:rgba(12,20,36,.8);--surface-2:rgba(17,28,48,.9);--surface-3:rgba(24,37,62,.95);
+      --border:rgba(220,232,255,.12);--line:rgba(136,162,214,.34);--text:#edf3ff;--muted:#a5b4d5;--faint:#7382a3;
+      --accent:#79e0cf;--accent-2:#7f9df1;--gold:#f0c971;--gold-2:#ffefaf;--locked:#5d6883;--success:#dba848;
+      --radius-sm:.5rem;--radius-md:.9rem;--radius-lg:1.25rem;--shadow:0 18px 44px rgba(0,0,0,.33);
+      --font-body:'General Sans',Inter,system-ui,sans-serif;--font-display:'Zodiak',Georgia,serif;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    body{
+      min-height:100vh;font-family:var(--font-body);font-size:var(--text-base);line-height:1.6;color:var(--text);
+      background:
+      radial-gradient(circle at 15% 18%, rgba(52,92,163,.36), transparent 24%),
+      radial-gradient(circle at 82% 10%, rgba(32,115,112,.22), transparent 18%),
+      linear-gradient(180deg,#08101d 0%,#050913 100%);
+    }
+
+    body:before{
+      content:'';
+      position:fixed;inset:0;pointer-events:none;opacity:.28;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px,#fff,transparent),
+        radial-gradient(1px 1px at 100px 80px,#fff,transparent),
+        radial-gradient(1px 1px at 160px 20px,#fff,transparent),
+        radial-gradient(2px 2px at 240px 120px,rgba(255,255,255,.65),transparent);
+      background-size:280px 180px;
+    }
+
+    .wrap{max-width:1320px;margin:0 auto;padding:var(--space-8) var(--space-4) var(--space-16)}
+    .skip{position:absolute;left:-9999px}
+    .skip:focus{left:1rem;top:1rem;z-index:30;background:#fff;color:#000;padding:.75rem 1rem;border-radius:.5rem}
+
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4);margin-bottom:var(--space-8)}
+    .eyebrow{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.22em;color:var(--accent)}
+    h1{font-family:var(--font-display);font-size:clamp(2.2rem,4vw,3.8rem);line-height:.98;margin-top:.2rem}
+    .lead{max-width:60ch;color:var(--muted);margin-top:var(--space-3)}
+    .theme{
+      min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:999px;
+      border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text)
+    }
+
+    .layout{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-6);align-items:start}
+    .panel{
+      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);backdrop-filter:blur(10px)
+    }
+
+    .network{padding:var(--space-6);overflow:auto}
+    .tasks{padding:var(--space-6)}
+    h2{font-size:var(--text-lg);margin-bottom:var(--space-4)}
+
+    .legend{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-5)}
+    .chip{
+      padding:.45rem .8rem;border-radius:999px;border:1px solid var(--border);
+      font-size:var(--text-xs);color:var(--muted);background:rgba(255,255,255,.03)
+    }
+    .chip.done{background:rgba(240,201,113,.14);color:var(--gold-2);border-color:rgba(240,201,113,.35)}
+    .chip.ready{background:rgba(121,224,207,.09);color:#dffcf6;border-color:rgba(121,224,207,.25)}
+    .chip.locked{background:rgba(125,137,168,.08);color:#8d97af;border-color:rgba(125,137,168,.18)}
+
+    .map-shell{
+      min-width:740px;padding:var(--space-4);border-radius:calc(var(--radius-lg) - .4rem);
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+      border:1px solid rgba(255,255,255,.04)
+    }
+
+    .map-svg{width:100%;height:auto;display:block}
+    .hex{cursor:pointer;transition:transform .18s ease, filter .18s ease}
+    .hex:hover{transform:translateY(-3px)}
+    .hex polygon.main{stroke-width:2;transition:fill .18s ease, stroke .18s ease, filter .18s ease}
+    .hex text.num{font-size:18px;font-weight:700;letter-spacing:.06em}
+    .hex text.label{font-size:13px;font-weight:600}
+
+    .hex.done polygon.main{fill:url(#goldFill);stroke:#ffe7a1;filter:url(#goldGlow)}
+    .hex.done text{fill:#211300}
+    .hex.ready polygon.main{fill:url(#readyFill);stroke:#9beee0}
+    .hex.ready text{fill:#f2fbff}
+    .hex.locked polygon.main{fill:#202b40;stroke:#48536f}
+    .hex.locked text{fill:#7e8aa6}
+
+    .edge{stroke:var(--line);stroke-width:3;stroke-linecap:round;fill:none;transition:stroke .18s ease, opacity .18s ease}
+    .edge.done{stroke:#f1cb73;opacity:1}
+    .edge.ready{stroke:#8fe6d8;opacity:.8}
+    .edge.locked{stroke:#44516d;opacity:.52}
+
+    .summary{
+      margin-top:var(--space-5);display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3)
+    }
+    .stat{
+      background:rgba(255,255,255,.03);border:1px solid var(--border);
+      border-radius:1rem;padding:var(--space-4)
+    }
+    .stat-label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+    .stat-value{font-size:clamp(1.4rem,1.4rem + .8vw,2rem);font-weight:700;margin-top:.2rem}
+
+    .task-list{display:grid;gap:var(--space-4)}
+    .task-card{
+      border:1px solid var(--border);border-radius:1.1rem;padding:var(--space-5);
+      background:rgba(255,255,255,.03);transition:transform .18s ease,border-color .18s ease,background .18s ease
+    }
+    .task-card:hover{transform:translateY(-2px)}
+    .task-card.done{background:rgba(240,201,113,.12);border-color:rgba(240,201,113,.33)}
+    .task-card.ready{background:rgba(121,224,207,.08);border-color:rgba(121,224,207,.22)}
+    .task-card.locked{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.05)}
+
+    .task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-3)}
+    .task-number{
+      width:2.2rem;height:2.2rem;border-radius:999px;display:grid;place-items:center;font-weight:700;
+      font-size:var(--text-sm);border:1px solid var(--border);flex:0 0 auto
+    }
+    .task-card.done .task-number{background:rgba(240,201,113,.22);color:#221500;border-color:rgba(255,231,161,.65)}
+    .task-card.ready .task-number{background:rgba(121,224,207,.16);color:#effffc;border-color:rgba(121,224,207,.4)}
+    .task-card.locked .task-number{background:rgba(93,104,131,.16);color:#93a0bb;border-color:rgba(93,104,131,.3)}
+
+    .task-title{font-weight:700;font-size:var(--text-lg);line-height:1.15}
+    .task-state{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.14em;margin-top:.45rem}
+    .task-desc{margin-top:var(--space-3);color:var(--muted);max-width:none}
+
+    .task-actions{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-4)}
+    .toggle-btn,.brief-btn{
+      min-height:44px;padding:.8rem 1rem;border-radius:999px;font-weight:600;font-size:var(--text-sm)
+    }
+    .toggle-btn{
+      border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text)
+    }
+    .toggle-btn:hover:not([disabled]){
+      background:rgba(255,255,255,.08)
+    }
+    .brief-btn{
+      border:1px solid rgba(121,224,207,.28);background:rgba(121,224,207,.12);color:#ebfffb
+    }
+    .brief-btn:hover:not([disabled]){
+      background:rgba(121,224,207,.18);box-shadow:0 0 0 1px rgba(121,224,207,.12) inset
+    }
+
+    button[disabled]{opacity:.45;cursor:not-allowed}
+    .micro{margin-top:var(--space-3);font-size:var(--text-xs);color:var(--faint)}
+
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(3,6,12,.68);backdrop-filter:blur(8px);
+      display:flex;align-items:center;justify-content:center;padding:var(--space-4);
+      z-index:40;opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s ease
+    }
+    .modal-backdrop.open{opacity:1;visibility:visible}
+
+    .modal{
+      width:min(860px,100%);max-height:min(88vh,920px);overflow:auto;
+      background:linear-gradient(180deg,rgba(10,18,32,.98),rgba(8,14,26,.98));
+      border:1px solid rgba(226,235,255,.14);border-radius:1.4rem;
+      box-shadow:0 30px 80px rgba(0,0,0,.45);padding:var(--space-6)
+    }
+
+    .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-4);margin-bottom:var(--space-5)}
+    .modal-kicker{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.18em;color:var(--accent)}
+    .modal-title{font-family:var(--font-display);font-size:clamp(1.8rem,2.4vw,2.5rem);line-height:1.02;margin-top:.35rem}
+    .modal-close{
+      min-width:44px;min-height:44px;border-radius:999px;border:1px solid var(--border);
+      background:rgba(255,255,255,.04);color:var(--text)
+    }
+
+    .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+    .brief-card{
+      background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:1rem;padding:var(--space-5)
+    }
+    .brief-card h4{
+      font-size:var(--text-sm);text-transform:uppercase;letter-spacing:.14em;color:var(--gold-2);margin-bottom:var(--space-3)
+    }
+    .brief-card p{color:var(--text);max-width:none}
+    .brief-card ul{list-style:none;display:grid;gap:var(--space-2);margin-top:var(--space-3)}
+    .brief-card li{position:relative;padding-left:1.1rem;color:var(--muted)}
+    .brief-card li::before{content:'✦';position:absolute;left:0;color:var(--accent)}
+    .brief-meta{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-4)}
+    .brief-meta .chip{background:rgba(255,255,255,.04)}
+
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr}
+      .map-shell{min-width:100%}
+    }
+
+    @media (max-width:860px){
+      .modal-grid{grid-template-columns:1fr}
+      .modal{padding:var(--space-4)}
+    }
+
+    @media (max-width:720px){
+      .topbar{flex-direction:column}
+      .summary{grid-template-columns:1fr}
+      .network,.tasks{padding:var(--space-4)}
+      .task-head{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip">Přeskočit na obsah</a>
+
+  <div class="wrap">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">Kolonizační protokol</div>
+        <h1>Planeta Peťka</h1>
+        <p class="lead">
+          Přehled kolonizačních fází, návazností a stavu mise. Odemčené fáze lze zahájit, splněné zůstávají archivované jako potvrzené milníky osídlení.
+        </p>
+      </div>
+
+      <button class="theme" type="button" data-theme-toggle aria-label="Přepnout režim">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+      </button>
+    </header>
+
+    <main id="main" class="layout">
+      <section class="panel network" aria-labelledby="sit-title">
+        <h2 id="sit-title">Hexagonová síť kolonizace</h2>
+
+        <div class="legend">
+          <span class="chip ready">Lze zahájit</span>
+          <span class="chip done">Splněno</span>
+          <span class="chip locked">Nelze zahájit</span>
+        </div>
+
+        <div class="map-shell">
+          <svg class="map-svg" viewBox="0 0 900 760" role="img" aria-label="Hexagonová síť úkolů">
+            <defs>
+              <linearGradient id="goldFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffefaf"/>
+                <stop offset="100%" stop-color="#dca748"/>
+              </linearGradient>
+              <linearGradient id="readyFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#18364a"/>
+                <stop offset="100%" stop-color="#2a6c79"/>
+              </linearGradient>
+              <filter id="goldGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="6" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <path id="edge-1-2" class="edge" d="M450 132 L355 218" />
+            <path id="edge-1-3" class="edge" d="M450 132 L545 218" />
+
+            <path id="edge-2-4" class="edge" d="M315 292 L230 378" />
+            <path id="edge-2-5" class="edge" d="M315 292 L450 378" />
+            <path id="edge-3-5" class="edge" d="M585 292 L450 378" />
+            <path id="edge-3-6" class="edge" d="M585 292 L670 378" />
+
+            <path id="edge-6-7" class="edge" d="M670 452 L585 540" />
+            <path id="edge-4-8" class="edge" d="M230 452 L315 540" />
+            <path id="edge-5-8" class="edge" d="M450 452 L315 540" />
+
+            <path id="edge-7-9" class="edge" d="M585 614 L450 700" />
+            <path id="edge-8-9" class="edge" d="M315 614 L450 700" />
+
+            <g class="hex" id="hex-1" data-id="1" transform="translate(450 92)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">1</text>
+              <text class="label" x="0" y="16" text-anchor="middle">Vesmírná</text>
+              <text class="label" x="0" y="31" text-anchor="middle">bitva</text>
+            </g>
+
+            <g class="hex" id="hex-2" data-id="2" transform="translate(315 252)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">2</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Průzkum</text>
+              <text class="label" x="0" y="25" text-anchor="middle">terénu</text>
+            </g>
+
+            <g class="hex" id="hex-3" data-id="3" transform="translate(585 252)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">3</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Hloubkový</text>
+              <text class="label" x="0" y="25" text-anchor="middle">vrt</text>
+            </g>
+
+            <g class="hex" id="hex-4" data-id="4" transform="translate(230 412)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">4</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Expedice</text>
+              <text class="label" x="0" y="25" text-anchor="middle">po planetě</text>
+            </g>
+
+            <g class="hex" id="hex-5" data-id="5" transform="translate(450 412)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">5</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Atmosférická</text>
+              <text class="label" x="0" y="25" text-anchor="middle">bouře</text>
+            </g>
+
+            <g class="hex" id="hex-6" data-id="6" transform="translate(670 412)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">6</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Budování</text>
+              <text class="label" x="0" y="25" text-anchor="middle">infrastruktury</text>
+            </g>
+
+            <g class="hex" id="hex-7" data-id="7" transform="translate(585 574)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">7</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Pozemní</text>
+              <text class="label" x="0" y="25" text-anchor="middle">transportní síť</text>
+            </g>
+
+            <g class="hex" id="hex-8" data-id="8" transform="translate(315 574)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">8</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Průnik do</text>
+              <text class="label" x="0" y="25" text-anchor="middle">jádra planety</text>
+            </g>
+
+            <g class="hex" id="hex-9" data-id="9" transform="translate(450 700)">
+              <polygon class="main" points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"></polygon>
+              <text class="num" x="0" y="-6" text-anchor="middle">9</text>
+              <text class="label" x="0" y="10" text-anchor="middle">Rozmnožování</text>
+              <text class="label" x="0" y="25" text-anchor="middle">obyvatelstva</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="summary">
+          <div class="stat">
+            <div class="stat-label">Splněné fáze</div>
+            <div class="stat-value" id="doneCount">0 / 9</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Lze zahájit</div>
+            <div class="stat-value" id="readyCount">1</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Uzamčené fáze</div>
+            <div class="stat-value" id="lockedCount">8</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel tasks" aria-labelledby="ukoly-title">
+        <h2 id="ukoly-title">Výčet fází mise</h2>
+        <div class="task-list" id="taskList"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="briefingModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <div>
+          <div class="modal-kicker">Briefing mise</div>
+          <h3 class="modal-title" id="modalTitle">Fáze mise</h3>
+        </div>
+        <button class="modal-close" type="button" id="closeModal" aria-label="Zavřít briefing">✕</button>
+      </div>
+
+      <div class="modal-grid">
+        <section class="brief-card">
+          <h4>Příběhový briefing</h4>
+          <p id="modalStory"></p>
+          <div class="brief-meta">
+            <span class="chip" id="modalTag"></span>
+            <span class="chip" id="modalState"></span>
+          </div>
+        </section>
+
+        <section class="brief-card">
+          <h4>Reálné zadání úkolu</h4>
+          <p id="modalMission"></p>
+          <ul id="modalOutputs"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const toggle = document.querySelector('[data-theme-toggle]');
+      const root = document.documentElement;
+      let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.setAttribute('data-theme', theme);
+      toggle?.addEventListener('click', () => {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', theme);
+      });
+    })();
+
+    const tasks = [
+      {
+        id: 1,
+        title: 'Vesmírná bitva',
+        desc: 'Orbitální koridor k planetě je blokován konkurenčními silami. Bez vítězství ve střetu nelze zahájit kolonizaci.',
+        story: 'Kolonizační flotila vstupuje do horních vrstev orbitálního prostoru planety Peťka. Vektor přiblížení je však narušen přítomností konkurenčních lodí, které se snaží získat přístup k planetárnímu koridoru dříve. Bez rychlého taktického vítězství nebude možné vysadit první osadnický tým.',
+        mission: 'Absolvujte laser game jako orbitální střet o přístup k planetě. Cílem je vybojovat převahu, přežít první kontakt a potvrdit, že výsadek má právo zahájit kolonizační operaci.',
+        outputs: [
+          'Vyhrát nebo důstojně ustát střet v aréně.',
+          'Určit, kdo z posádky byl elitní pilot, střelec a poslední přeživší.',
+          'Po boji oficiálně potvrdit, že koridor k planetě je otevřen.'
+        ],
+        tag: 'Orbitální konflikt'
+      },
+      {
+        id: 2,
+        title: 'Průzkum terénu',
+        desc: 'Po nouzovém sestupu je třeba zmapovat okolí a určit první bezpečné body zájmu v obyvatelné zóně.',
+        story: 'Po nouzovém sestupu ztrácí posádka část navigačních systémů a přistává v neznámém sektoru. Je třeba zmapovat okolní biomechanické i civilizační body zájmu, určit bezpečné trasy a lokalizovat první zónu vhodnou pro kontakt se světem planety.',
+        mission: 'Bez použití mobilu proveďte první průzkum okolí základny. Najděte orientační body, nejbližší hospodu nebo jiný zásobovací bod, vytipujte cíl další expedice a zaznamenejte jednoduchou mapu obyvatelné zóny.',
+        outputs: [
+          'Zakreslit vlastní mini-mapu nebo schéma okolí.',
+          'Vybrat cíl sobotní expedice.',
+          'Provést první terénní zastávku u piva jako potvrzení obyvatelnosti oblasti.'
+        ],
+        tag: 'Povrchový sken'
+      },
+      {
+        id: 3,
+        title: 'Hloubkový vrt',
+        desc: 'Pod povrchem se nachází zásobárna vody. Bez přístupu k ní není možné spustit životní modul kolonie.',
+        story: 'Senzory ukazují, že pod povrchem se ukrývá stabilní zásobárna vody, ale přístup k ní vyžaduje koordinovaný zásah. Bez otevření vrtu nebude možné spustit plnohodnotný životní modul ani dlouhodobý pobyt osadníků.',
+        mission: 'Splňte týmový úkol spojený s kapalinou nebo transportem vody. Doporučená varianta: přenést co nejrychleji vodu mezi nádobami nebo potrubím tak, aby se naplnil centrální reaktor bez velkých ztrát.',
+        outputs: [
+          'Přenést stanovené množství tekutiny do cílové nádoby.',
+          'Dodržet časový limit nebo týmovou koordinaci.',
+          'Vyhlásit, že vodní rezervoár byl úspěšně otevřen.'
+        ],
+        tag: 'Hydrologický přístup'
+      },
+      {
+        id: 4,
+        title: 'Expedice po planetě',
+        desc: 'Kolonie potřebuje širší průzkum území a potvrzení dalších zdrojů nezbytných k přežití.',
+        story: 'První základna může přežít jen krátce. Pro další růst je nutné prozkoumat širší území, vytipovat zásoby energie, potravy a strategických materiálů a ověřit, zda je planeta schopná dlouhodobé kolonizace.',
+        mission: 'Absolvujte hlavní výpravu krajinou, ideálně sobotní túru. Cestou sbírejte nebo zapisujte nalezené „suroviny“ — například body za výhled, vodu, hospodu, stín, dřevo, kámen nebo zajímavý orientační bod.',
+        outputs: [
+          'Dokončit celou trasu expedice.',
+          'Sepsat alespoň několik nalezených zdrojů.',
+          'Vrátit se se zprávou, že planeta je logisticky zvládnutelná.'
+        ],
+        tag: 'Dálkový průzkum'
+      },
+      {
+        id: 5,
+        title: 'Atmosférická bouře',
+        desc: 'Nestabilní klima planety prověří komunikaci posádky a její schopnost přežít krizový režim.',
+        story: 'Planetární klima se ukazuje jako nestabilní a posádka se dostává do situace, kdy špatná komunikace může ohrozit celou kolonii. Je nutné zvládnout krizový režim, rozdělit role a udržet disciplínu i při ztížených podmínkách.',
+        mission: 'Zařaďte kooperativní krizový úkol se zhoršenou komunikací. Dobře funguje slepá navigace, vedení jednoho člena týmu hlasem, nebo společné řešení problému pod časovým tlakem a s omezenými informacemi.',
+        outputs: [
+          'Dokončit krizový úkol bez rozpadu velení.',
+          'Vyhodnotit, kdo udržel klid a kdo zachránil situaci.',
+          'Potvrdit, že kolonie přežila první klimatickou zkoušku.'
+        ],
+        tag: 'Krizový režim'
+      },
+      {
+        id: 6,
+        title: 'Budování infrastruktury',
+        desc: 'Po prvním přežití je čas vybudovat funkční obytnou a logistickou síť kolonie.',
+        story: 'Po přežití prvních dnů přichází fáze stabilizace. Kolonie potřebuje obytné moduly, zásobovací uzly, energetické centrum a jasný plán, jak budou jednotlivé části fungovat dohromady.',
+        mission: 'Postavte improvizovaný model kolonie z věcí, které máte po ruce na chatě nebo v okolí. Každý modul musí mít funkci: bydlení, energie, voda, zásoby, obrana nebo společný prostor.',
+        outputs: [
+          'Vytvořit fyzický model nebo náčrt kolonie.',
+          'Pojmenovat jednotlivé moduly.',
+          'Představit infrastrukturní plán zbytku posádky.'
+        ],
+        tag: 'Koloniální jádro'
+      },
+      {
+        id: 7,
+        title: 'Pozemní transportní síť',
+        desc: 'Růst kolonie vyžaduje rychlý přesun mezi sektory a test spolehlivosti dopravních koridorů.',
+        story: 'S rozšiřováním kolonie vyvstává potřeba rychlého a spolehlivého přesunu mezi klíčovými sektory. Dopravní trasy musí být rychlé, ale současně bezpečné, protože jediná chyba může vyřadit důležitý článek celé mise.',
+        mission: 'Absolvujte motokáry jako test planetární dopravní sítě. Nejde jen o rychlost, ale i o schopnost držet stopu, zvládat zatáčky a dorazit do cíle bez kolapsu transportního systému.',
+        outputs: [
+          'Odjet závod nebo sérii jízd.',
+          'Vyhlásit nejrychlejšího pilota kolonie.',
+          'Potvrdit, že síť pozemního transportu byla zprovozněna.'
+        ],
+        tag: 'Rychlostní koridory'
+      },
+      {
+        id: 8,
+        title: 'Průnik do jádra planety',
+        desc: 'Pod povrchem se skrývá řídicí struktura planety. K jejímu pochopení je nutné proniknout do jádra.',
+        story: 'Pod povrchem planety se ukrývá řídicí struktura, která vysvětluje její vnitřní zákony a reakce. Kdo chce Peťku skutečně ovládnout a pochopit, musí proniknout až k jejímu jádru a správně dešifrovat její logiku.',
+        mission: 'Absolvujte únikovou hru jako průnik do podzemního komplexu. Do této fáze je vhodné vložit i otázky z archivu planety — tedy znalostní test, jak dobře je posádce znám její vnitřní systém.',
+        outputs: [
+          'Dokončit únikovou hru nebo dojít co nejdál.',
+          'Vyřešit část znalostních otázek z archivu planety.',
+          'Potvrdit, že jádro planety bylo alespoň částečně dešifrováno.'
+        ],
+        tag: 'Archiv planety'
+      },
+      {
+        id: 9,
+        title: 'Rozmnožování obyvatelstva',
+        desc: 'Finální fáze potvrzuje dlouhodobou životaschopnost kolonie a její připravenost na další generaci.',
+        story: 'Po stabilizaci všech klíčových systémů může kolonie přejít do dlouhodobé perspektivy. Základna už nepřežívá ze dne na den, ale připravuje se na další generaci osadníků a trvalou budoucnost celé civilizace.',
+        mission: 'Dobrovolný bonusový modul. Vymyslete symbolické vybavení pro budoucího malého kolonistu, vytvořte návrh startovací výbavy nové generace nebo sepište krátký zakládací manifest pro další obyvatele planety.',
+        outputs: [
+          'Navrhnout alespoň jeden artefakt nebo pravidlo pro další generaci.',
+          'Slavnostně potvrdit dlouhodobou životaschopnost kolonie.',
+          'Uzavřít kolonizační protokol finálním prohlášením.'
+        ],
+        tag: 'Dlouhodobá expanze'
+      }
+    ];
+
+    const dependencies = {
+      1: [],
+      2: [1],
+      3: [1],
+      4: [2],
+      5: [2,3],
+      6: [3],
+      7: [6],
+      8: [4,5],
+      9: [7,8]
+    };
+
+    const edges = [
+      [1,2],[1,3],
+      [2,4],[2,5],[3,5],[3,6],
+      [6,7],[4,8],[5,8],
+      [7,9],[8,9]
+    ];
+
+    const doneSet = new Set();
+
+    const taskList = document.getElementById('taskList');
+    const doneCount = document.getElementById('doneCount');
+    const readyCount = document.getElementById('readyCount');
+    const lockedCount = document.getElementById('lockedCount');
+
+    const briefingModal = document.getElementById('briefingModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalStory = document.getElementById('modalStory');
+    const modalMission = document.getElementById('modalMission');
+    const modalOutputs = document.getElementById('modalOutputs');
+    const modalTag = document.getElementById('modalTag');
+    const modalState = document.getElementById('modalState');
+
+    function isDone(id){
+      return doneSet.has(id);
+    }
+
+    function isReady(id){
+      if(id === 1) return true;
+      const deps = dependencies[id] || [];
+      return deps.some(dep => doneSet.has(dep));
+    }
+
+    function stateOf(id){
+      if(isDone(id)) return 'done';
+      if(isReady(id)) return 'ready';
+      return 'locked';
+    }
+
+    function canRemainDone(id){
+      if(id === 1) return true;
+      const deps = dependencies[id] || [];
+      return deps.some(dep => doneSet.has(dep));
+    }
+
+    function normalizeDoneSet(){
+      let changed = true;
+      while(changed){
+        changed = false;
+        for(const task of tasks){
+          if(doneSet.has(task.id) && !canRemainDone(task.id)){
+            doneSet.delete(task.id);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    function openBriefing(task){
+      const state = isDone(task.id) ? 'Splněno' : (isReady(task.id) ? 'Lze zahájit' : 'Uzamčeno');
+      modalTitle.textContent = `${task.id}. ${task.title}`;
+      modalStory.textContent = task.story;
+      modalMission.textContent = task.mission;
+      modalTag.textContent = task.tag;
+      modalState.textContent = state;
+      modalOutputs.innerHTML = task.outputs.map(item => `<li>${item}</li>`).join('');
+      briefingModal.classList.add('open');
+      briefingModal.setAttribute('aria-hidden','false');
+      closeModal.focus();
+    }
+
+    function closeBriefingWindow(){
+      briefingModal.classList.remove('open');
+      briefingModal.setAttribute('aria-hidden','true');
+    }
+
+    function renderNetwork(){
+      for(const task of tasks){
+        const state = stateOf(task.id);
+        const hex = document.getElementById(`hex-${task.id}`);
+        hex.classList.remove('done','ready','locked');
+        hex.classList.add(state);
+      }
+
+      for(const [from, to] of edges){
+        const edge = document.getElementById(`edge-${from}-${to}`);
+        let cls = 'locked';
+        if(isDone(to)) cls = 'done';
+        else if(isReady(to) && isDone(from)) cls = 'ready';
+        edge.classList.remove('done','ready','locked');
+        edge.classList.add(cls);
+      }
+    }
+
+    function renderList(){
+      taskList.innerHTML = tasks.map(task => {
+        const done = isDone(task.id);
+        const ready = isReady(task.id);
+        const state = done ? 'done' : ready ? 'ready' : 'locked';
+        const stateLabel = done ? 'Splněno' : ready ? 'Lze zahájit' : 'Nelze zahájit';
+
+        return `
+          <article class="task-card ${state}">
+            <div class="task-head">
+              <div style="display:flex; gap:1rem; align-items:flex-start;">
+                <div class="task-number">${task.id}</div>
+                <div>
+                  <h3 class="task-title">${task.title}</h3>
+                  <div class="task-state">${stateLabel}</div>
+                </div>
+              </div>
+            </div>
+
+            <p class="task-desc">${task.desc}</p>
+
+            <div class="task-actions">
+              <button type="button" class="toggle-btn" ${!ready && !done ? 'disabled' : ''} data-id="${task.id}">
+                ${done ? 'Označit jako nesplněné' : 'Označit jako splněné'}
+              </button>
+              <button type="button" class="brief-btn" ${!ready && !done ? 'disabled' : ''} data-brief="${task.id}">
+                Briefing mise
+              </button>
+            </div>
+
+            <div class="micro">Fázi lze splnit pouze tehdy, pokud je splněna alespoň jedna přímo navazující předchozí fáze.</div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderSummary(){
+      const done = tasks.filter(task => isDone(task.id)).length;
+      const ready = tasks.filter(task => !isDone(task.id) && isReady(task.id)).length;
+      const locked = tasks.length - done - ready;
+
+      doneCount.textContent = `${done} / ${tasks.length}`;
+      readyCount.textContent = ready;
+      lockedCount.textContent = locked;
+    }
+
+    function renderAll(){
+      renderNetwork();
+      renderList();
+      renderSummary();
+    }
+
+    taskList.addEventListener('click', event => {
+      const briefButton = event.target.closest('[data-brief]');
+      if(briefButton){
+        const task = tasks.find(item => item.id === Number(briefButton.dataset.brief));
+        if(task && (isReady(task.id) || isDone(task.id))){
+          openBriefing(task);
+        }
+        return;
+      }
+
+      const button = event.target.closest('[data-id]');
+      if(!button) return;
+
+      const id = Number(button.dataset.id);
+      if(isDone(id)){
+        doneSet.delete(id);
+        normalizeDoneSet();
+      } else if(isReady(id)){
+        doneSet.add(id);
+      }
+
+      renderAll();
+    });
+
+    document.querySelector('.map-svg').addEventListener('click', event => {
+      const hex = event.target.closest('.hex');
+      if(!hex) return;
+      const id = Number(hex.dataset.id);
+      const task = tasks.find(item => item.id === id);
+      if(task && (isReady(id) || isDone(id))){
+        openBriefing(task);
+      }
+    });
+
+    closeModal.addEventListener('click', closeBriefingWindow);
+    briefingModal.addEventListener('click', event => {
+      if(event.target === briefingModal) closeBriefingWindow();
+    });
+    document.addEventListener('keydown', event => {
+      if(event.key === 'Escape') closeBriefingWindow();
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
