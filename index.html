@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=zodiak@400,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root{
       --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
@@ -346,7 +348,7 @@
       </section>
 
       <section class="panel tasks" aria-labelledby="ukoly-title">
-        <h2 id="ukoly-title">Výčet fází mise</h2>
+        <h2 id="ukoly-title">Fáze mise</h2>
         <div class="task-list" id="taskList"></div>
       </section>
     </main>
@@ -382,6 +384,9 @@
   </div>
 
   <script>
+    const SUPABASE_URL = 'https://okukscxyoeipkqehppnb.supabase.co/rest/v1/';
+    const SUPABASE_KEY = 'sb_publishable_DaVZxpDzA2c_b6FP4BLFWQ_aQUur5kg';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const tasks = [
       {
@@ -523,6 +528,17 @@
     ];
 
     const doneSet = new Set();
+
+    async function loadFromDB() {
+      const { data, error } = await sb.from('tasks').select('id, done');
+      if (error) { console.error('Supabase load error:', error); return; }
+      doneSet.clear();
+      for (const row of data) {
+        if (row.done) doneSet.add(row.id);
+      }
+      renderAll();
+    }
+
 
     const taskList = document.getElementById('taskList');
     const doneCount = document.getElementById('doneCount');
@@ -675,14 +691,21 @@
       if(!button) return;
 
       const id = Number(button.dataset.id);
-      if(isDone(id)){
-        doneSet.delete(id);
-        normalizeDoneSet();
-      } else if(isReady(id)){
+      const nowDone = !isDone(id);
+      if(nowDone){
         doneSet.add(id);
+      } else {
+        doneSet.delete(id);
       }
-
+      normalizeDoneSet();
       renderAll();
+
+      // Uložení do Supabase (aktualizuj i všechny sousedy co mohly být odstraněny)
+      const toUpdate = tasks.map(t => ({ id: t.id, done: doneSet.has(t.id) }));
+      sb.from('tasks').upsert(toUpdate).then(({ error }) => {
+        if(error) console.error('Supabase save error:', error);
+      });
+
     });
 
     document.querySelector('.map-svg').addEventListener('click', event => {
@@ -703,7 +726,7 @@
       if(event.key === 'Escape') closeBriefingWindow();
     });
 
-    renderAll();
+    loadFromDB();
   </script>
 </body>
 </html>
