@@ -205,6 +205,13 @@
       .network,.tasks{padding:var(--space-4)}
       .task-head{flex-direction:column}
     }
+
+    .admin-hint{
+      position:fixed;bottom:var(--space-4);right:var(--space-4);
+      font-size:var(--text-xs);color:var(--faint);opacity:.35;
+      pointer-events:none;user-select:none;z-index:5;
+    }
+
   </style>
 </head>
 <body>
@@ -397,7 +404,7 @@
         mission: 'Absolvuj laser game jako orbitální střet o přístup k planetě. Cílem je vybojovat převahu, přežít první kontakt a potvrdit, že právě naši osadníci mají právo zahájit kolonizační operaci.',
         outputs: [
           'Vyhrát nebo důstojně ustát střet v aréně.',
-          'Luky nesmí schytat nejvíce zásahů ze svého týmu'
+          'Neschytat nejvíce zásahů ze svého týmu'
         ],
         tag: 'Orbitální konflikt'
       },
@@ -419,7 +426,7 @@
         title: 'Hloubkový vrt',
         desc: 'Pod povrchem se nachází zásobárna vody. Bez přístupu k ní není možné spustit životní modul kolonie.',
         story: 'Geolog si myslí, že si oblast nouzového přistání pamatuje ze své analýzy Peťčina geomorfologického složení. Dole pod povrchem se prý ukrývá stabilní zásobárna vody, ale přístup k ní vyžaduje koordinovaný zásah. Bez provedení vrtu nebude možné spustit plnohodnotný životní modul ani dlouhodobý pobyt osadníků.',
-        mission: 'Vytvoř plán tekutých zásob do neděle dříve, než provedeme vrt (dorazíme do obchodu). Pokud se ti to nepodaří v časovém limitu, nebo budeš potřebovat příliš mnoho korekcí od ostatních kolonizátorů, na základně tě bude čekat trest, který s tekutými zásobami bude úzce souviset.',
+        mission: 'Vytvoř plán tekutých zásob na celý víkend dříve, než provedeme vrt (dorazíme do obchodu). Pokud se ti to nepodaří v časovém limitu, nebo budeš potřebovat příliš mnoho korekcí od ostatních kolonizátorů, na základně tě bude čekat trest, který s tekutými zásobami bude úzce souviset.',
         outputs: [
           'Vytvořit plán pro alko a nealko.',
           'Dodržet časový limit.',
@@ -455,13 +462,11 @@
       {
         id: 6,
         title: 'Budování infrastruktury',
-        desc: 'Po prvním přežití je čas vybudovat funkční obytnou a logistickou síť kolonie.',
+        desc: 'Po zajištění nezbytných životních funkcí je čas začít budovat pokročilé prvky kolonie.',
         story: 'Po přežití prvních dnů přichází fáze stabilizace. Kolonie potřebuje obytné moduly, zásobovací uzly, energetické centrum a jasný plán, jak budou jednotlivé části fungovat dohromady.',
-        mission: 'Postavte improvizovaný model kolonie z věcí, které máte po ruce na chatě nebo v okolí. Každý modul musí mít funkci: bydlení, energie, voda, zásoby, obrana nebo společný prostor.',
+        mission: 'TBD',
         outputs: [
-          'Vytvořit fyzický model nebo náčrt kolonie.',
-          'Pojmenovat jednotlivé moduly.',
-          'Představit infrastrukturní plán zbytku posádky.'
+          'TBD.'
         ],
         tag: 'Koloniální jádro'
       },
@@ -726,5 +731,8 @@
 
     loadFromDB();
   </script>
+
+  <div class="admin-hint">🔒 Admin mód vypnut</div>
+
 </body>
 </html>
