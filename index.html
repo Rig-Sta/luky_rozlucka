@@ -405,10 +405,10 @@
         id: 2,
         title: 'Průzkum terénu',
         desc: 'Po nouzovém sestupu je třeba zmapovat okolí a určit první bezpečné body zájmu v obyvatelné zóně.',
-        story: 'Už už to vypadalo na vítězství naší flotily, když v tom se dvě nepřátelské lodě vydaly na sebevražednou misi a naletěly přímo do našeho kapitánského křižníku. Pilot se snažil tomuto výpadu vyhnout, ale bylo příliš pozdě. Motory, které na orbitě vyrovnávaly gravitaci, selhaly a museli jsme zahájit nouzový sestup. Nebylo to hladké přistání, ale většina posádky přežila. Dostali jsme se však do neznámého sektoru a navíc jsme ztratili část navigačních systémů. Je třeba zmapovat okolní biomechanické i civilizační body zájmu, určit bezpečné trasy a lokalizovat první zónu vhodnou pro kontakt s faunou a florou planety Peťka.',
-        mission: 'Bez použití mobilu proveďte první průzkum okolí základny. Najděte orientační body, nejbližší hospodu nebo jiný zásobovací bod, vytipujte cíl další expedice a zaznamenejte jednoduchou mapu obyvatelné zóny.',
+        story: 'Už už to vypadalo na vítězství naší flotily, když v tom se dvě nepřátelské lodě vydaly na sebevražednou misi a naletěly přímo do našeho kapitánského křižníku. Pilot se snažil tomuto výpadu vyhnout, ale bylo příliš pozdě. Motory, které na orbitě vyrovnávaly gravitaci, selhaly a museli jsme zahájit nouzový sestup. Nebylo to hladké přistání, ale většina posádky přežila. Dostali jsme se však do neznámého sektoru a navíc jsme ztratili část navigačních systémů. Je třeba zmapovat okolní body zájmu, určit bezpečné trasy a lokalizovat první zónu vhodnou pro kontakt s faunou a florou planety Peťka.',
+        mission: 'Bez použití mobilu proveď první průzkum okolí základny. Najdi orientační body, nejbližší hospodu nebo jiný zásobovací bod, vytipuj cíl další expedice a zaznamenej jednoduchou mapu obyvatelné zóny. Rozděl úkoly a zapoj tým.',
         outputs: [
-          'Zakreslit vlastní mini-mapu nebo schéma okolí.',
+          'Zakreslit vlastní mini-mapu nebo schéma okolí = nového Sektoru 1.',
           'Vybrat cíl sobotní expedice.',
           'Provést první zastávku u piva a potvrdit tím obyvatelnost oblasti.'
         ],
@@ -418,12 +418,12 @@
         id: 3,
         title: 'Hloubkový vrt',
         desc: 'Pod povrchem se nachází zásobárna vody. Bez přístupu k ní není možné spustit životní modul kolonie.',
-        story: 'Senzory ukazují, že pod povrchem se ukrývá stabilní zásobárna vody, ale přístup k ní vyžaduje koordinovaný zásah. Bez otevření vrtu nebude možné spustit plnohodnotný životní modul ani dlouhodobý pobyt osadníků.',
-        mission: 'Splňte týmový úkol spojený s kapalinou nebo transportem vody. Doporučená varianta: přenést co nejrychleji vodu mezi nádobami nebo potrubím tak, aby se naplnil centrální reaktor bez velkých ztrát.',
+        story: 'Geolog si myslí, že si oblast nouzového přistání pamatuje ze své analýzy Peťčina geomorfologického složení. Dole pod povrchem se prý ukrývá stabilní zásobárna vody, ale přístup k ní vyžaduje koordinovaný zásah. Bez provedení vrtu nebude možné spustit plnohodnotný životní modul ani dlouhodobý pobyt osadníků.',
+        mission: 'Vytvoř plán tekutých zásob do neděle dříve, než provedeme vrt (dorazíme do obchodu). Pokud se ti to nepodaří v časovém limitu, nebo budeš potřebovat příliš mnoho korekcí od ostatních kolonizátorů, na základně tě bude čekat trest, který s tekutými zásobami bude úzce souviset.',
         outputs: [
-          'Přenést stanovené množství tekutiny do cílové nádoby.',
-          'Dodržet časový limit nebo týmovou koordinaci.',
-          'Vyhlásit, že vodní rezervoár byl úspěšně otevřen.'
+          'Vytvořit plán pro alko a nealko.',
+          'Dodržet časový limit.',
+          'V případě neúspěchu splnit trestný úkol.'
         ],
         tag: 'Hydrologický přístup'
       },
@@ -431,11 +431,10 @@
         id: 4,
         title: 'Expedice po planetě',
         desc: 'Kolonie potřebuje širší průzkum území a potvrzení dalších zdrojů nezbytných k přežití.',
-        story: 'První základna může přežít jen krátce. Pro další růst je nutné prozkoumat širší území, vytipovat zásoby energie, potravy a strategických materiálů a ověřit, zda je planeta schopná dlouhodobé kolonizace.',
-        mission: 'Absolvujte hlavní výpravu krajinou, ideálně sobotní túru. Cestou sbírejte nebo zapisujte nalezené „suroviny“ — například body za výhled, vodu, hospodu, stín, dřevo, kámen nebo zajímavý orientační bod.',
+        story: 'Sektor 1 je obyvatelný. Toto hlášení naše osadníky mírně uklidnilo. Pro další růst kolonie je ale nutné prozkoumat širší území, vytipovat zásoby energie, potravy a strategických materiálů a ověřit, zda je planeta Peťka vhodná pro dlouhodobou kolonizaci.',
+        mission: 'Absolvuj sobotní výpravu.',
         outputs: [
           'Dokončit celou trasu expedice.',
-          'Sepsat alespoň několik nalezených zdrojů.',
           'Vrátit se se zprávou, že planeta je logisticky zvládnutelná.'
         ],
         tag: 'Dálkový průzkum'
@@ -443,15 +442,15 @@
       {
         id: 5,
         title: 'Atmosférická bouře',
-        desc: 'Nestabilní klima planety prověří komunikaci posádky a její schopnost přežít krizový režim.',
-        story: 'Planetární klima se ukazuje jako nestabilní a posádka se dostává do situace, kdy špatná komunikace může ohrozit celou kolonii. Je nutné zvládnout krizový režim, rozdělit role a udržet disciplínu i při ztížených podmínkách.',
-        mission: 'Zařaďte kooperativní krizový úkol se zhoršenou komunikací. Dobře funguje slepá navigace, vedení jednoho člena týmu hlasem, nebo společné řešení problému pod časovým tlakem a s omezenými informacemi.',
+        desc: 'Nestabilní klima planety prověří schopnost osadníků porozumět zákonitostem planety.',
+        story: 'Bouře nás zastihla zcela nepřipravené. Nevěděli jsme, kam se schovat, jak rychle ochránit suroviny a materiál, ani jak dlouho bude nečas trvat a co všechno se během něj může stát. Důsledky byly katastrofální - srovnatelné s budováním celé kolonie nanovo. Životní modul vypověděl službu, přestali fungovat sestrojení roboti a obnovit hloubkový vrt dalo také zabrat. Podcenili jsme nutnost porozumění fungování planetární atmosféry a teď víme, že už se to nesmí opakovat.',
+        mission: 'Odhadni, jak Peťka odpovídala na předem připravené otázky.',
         outputs: [
-          'Dokončit krizový úkol bez rozpadu velení.',
-          'Vyhodnotit, kdo udržel klid a kdo zachránil situaci.',
-          'Potvrdit, že kolonie přežila první klimatickou zkoušku.'
+          'Odpovědět víckrát správně než špatně.',
+          'Nepokazit žádnou otázku, kterou Peťka označila za důležitou.',
+          'V případě selhání splnit trestný úkol.'
         ],
-        tag: 'Krizový režim'
+        tag: 'Nepřízeň počasí'
       },
       {
         id: 6,
