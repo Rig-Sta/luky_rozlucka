@@ -218,9 +218,12 @@
 
     .admin-hint{
       position:fixed;bottom:var(--space-4);right:var(--space-4);
-      font-size:var(--text-xs);color:var(--faint);opacity:.35;
-      pointer-events:none;user-select:none;z-index:5;
+      font-size:var(--text-xs);color:var(--faint);opacity:.4;
+      pointer-events:auto;cursor:pointer;user-select:none;z-index:5;
+      transition:opacity .15s ease,color .15s ease;
     }
+    .admin-hint:hover{opacity:.85}
+    .admin-hint.on{color:var(--accent);opacity:.9}
 
     .topbar-actions{flex:0 0 auto}
     .story-body p{color:var(--text);margin-bottom:var(--space-4);max-width:none}
@@ -445,6 +448,10 @@
     const SUPABASE_URL = 'https://okukscxyoeipkqehppnb.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_DaVZxpDzA2c_b6FP4BLFWQ_aQUur5kg';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // === Admin mód: fáze lze označovat jako splněné/nesplněné jen po zadání hesla ===
+    const ADMIN_PASSWORD = 'kolonoskopie';   // ← ZMĚŇ SI HESLO; je uložené přímo v kódu stránky
+    let adminMode = false;
 
     const tasks = [
       {
@@ -812,6 +819,11 @@
       const button = event.target.closest('[data-id]');
       if(!button) return;
 
+      if(!adminMode){                 // fáze lze označovat jen v admin módu (po zadání hesla)
+        requestAdmin();
+        return;
+      }
+
       const id = Number(button.dataset.id);
       const nowDone = !isDone(id);
       if(nowDone && id === PHOTO_TASK_ID && !photoStats().majority){
@@ -911,10 +923,38 @@
     try{ storySeen = localStorage.getItem('petka_story_seen') === '1'; }catch(e){}
     if(!storySeen) openStory();
 
+    // === Admin mód – ovládání ===
+    const adminHint = document.getElementById('adminToggle');
+
+    function updateAdminHint(){
+      adminHint.textContent = adminMode ? '🔓 Admin mód zapnut' : '🔒 Admin mód vypnut';
+      adminHint.classList.toggle('on', adminMode);
+      adminHint.title = adminMode ? 'Klikni pro vypnutí admin módu' : 'Klikni pro zadání hesla';
+    }
+
+    function requestAdmin(){
+      if(adminMode){                 // ve zapnutém režimu klik = vypnout
+        adminMode = false;
+        updateAdminHint();
+        return;
+      }
+      const entered = prompt('Zadej heslo pro označování fází:');
+      if(entered === null) return;   // uživatel zrušil
+      if(entered === ADMIN_PASSWORD){
+        adminMode = true;
+        updateAdminHint();
+      } else {
+        alert('Nesprávné heslo.');
+      }
+    }
+
+    adminHint.addEventListener('click', requestAdmin);
+    updateAdminHint();
+
     loadFromDB();
   </script>
 
-  <div class="admin-hint">🔒 Admin mód vypnut</div>
+  <div class="admin-hint" id="adminToggle" title="Klikni pro zadání hesla">🔒 Admin mód vypnut</div>
 
 </body>
 </html>
