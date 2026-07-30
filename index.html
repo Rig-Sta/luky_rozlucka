@@ -222,6 +222,12 @@
       pointer-events:none;user-select:none;z-index:5;
     }
 
+    .topbar-actions{flex:0 0 auto}
+    .story-body p{color:var(--text);margin-bottom:var(--space-4);max-width:none}
+    .story-body p:last-child{margin-bottom:0}
+    .story-body .drop{font-family:var(--font-display);color:var(--gold-2)}
+    .story-actions{display:flex;justify-content:flex-end;margin-top:var(--space-5)}
+
   </style>
 </head>
 <body>
@@ -235,6 +241,9 @@
         <p class="lead">
           Přehled kolonizačních fází, návazností a stavu mise. Odemčené fáze lze zahájit, splněné zůstávají archivované jako potvrzené milníky osídlení.
         </p>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="brief-btn" id="openStory">Úvod příběhu</button>
       </div>
     </header>
 
@@ -400,6 +409,34 @@
             <ul id="modalPhotoList" class="photo-check-list"></ul>
           </div>
         </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="storyModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="storyTitle">
+      <div class="modal-head">
+        <div>
+          <div class="modal-kicker">Úvod příběhu</div>
+          <h3 class="modal-title" id="storyTitle">Prolog: Nesnadné rozhodnutí</h3>
+        </div>
+        <button class="modal-close" type="button" id="closeStory" aria-label="Zavřít úvod">✕</button>
+      </div>
+
+      <section class="brief-card story-body">
+        <p>Toho dne Luky nemohl dospat. Probudil se dříve a poněkud nervózní. Už nějakou dobu věděl, že k tomu rozhodnutí jeho život spěje, ale čím víc se blížil tenhle den, tím víc přemýšlel nad tím, jaké alternativy se nabízejí a jestli chce opravdu zasvětit život této cestě.</p>
+
+        <p>Život na planetě Zemi ho baví - přece jen je to planeta jeho rodičů, jejich rodičů a celých generací před nimi. Všechno je tady známé, jednoduché, nevyžadující zvýšenou pozornost. Ale je to všechno, co může život přinést?</p>
+
+        <p>Čím dál více jeho přátel se vydává na cestu, z níž není snadného návratu. A téměř výhradně pak zpátky na Zemi chodí hlášení o tom, jaká zažívají dobrodružství, jak nadšení jsou ze svého rozhodnutí a v čem jsou nově objevené planety lepší než Země. Luky po tom dobrodružství začal toužit. Našel planetu v Pavláskově hvězdokupě, na kterou zatím pozemšťan nevstoupil, a už po prvních skenech se do ní zamiloval.</p>
+
+        <p>Toho dne, kdy Luky působil lehce nervózně, ale šťastně, jsme jako jeho nejbližší členové posádky slyšeli jednu odhodlanou větu, která znamenala, že se životy nás všech změní. Rozhodl se kolonizovat planetu <strong>Peťka</strong>, i kdyby to měla být poslední mise jeho života.</p>
+
+        <p>Systémy jsou spušťěny, vzletový koridor je otevřen. Všechny nás čeká poslední vesmírná mise našich životů. Tak ať je epická.</p>
+      </section>
+
+      <div class="story-actions">
+        <button type="button" class="brief-btn" id="enterMission">Otevřít kolonizační protokol</button>
       </div>
     </div>
   </div>
@@ -808,9 +845,38 @@
     briefingModal.addEventListener('click', event => {
       if(event.target === briefingModal) closeBriefingWindow();
     });
-    document.addEventListener('keydown', event => {
-      if(event.key === 'Escape') closeBriefingWindow();
+    // === Úvod příběhu (prolog) ===
+    const storyModal = document.getElementById('storyModal');
+    const openStoryBtn = document.getElementById('openStory');
+    const closeStoryBtn = document.getElementById('closeStory');
+    const enterMissionBtn = document.getElementById('enterMission');
+
+    function openStory(){
+      storyModal.classList.add('open');
+      storyModal.setAttribute('aria-hidden','false');
+      closeStoryBtn.focus();
+    }
+    function closeStory(){
+      storyModal.classList.remove('open');
+      storyModal.setAttribute('aria-hidden','true');
+      try{ localStorage.setItem('petka_story_seen','1'); }catch(e){}
+    }
+
+    openStoryBtn.addEventListener('click', openStory);
+    closeStoryBtn.addEventListener('click', closeStory);
+    enterMissionBtn.addEventListener('click', closeStory);
+    storyModal.addEventListener('click', event => {
+      if(event.target === storyModal) closeStory();
     });
+
+    document.addEventListener('keydown', event => {
+      if(event.key === 'Escape'){ closeBriefingWindow(); closeStory(); }
+    });
+
+    // prolog se ukáže sám při první návštěvě; přes tlačítko v hlavičce jde otevřít kdykoli
+    let storySeen = false;
+    try{ storySeen = localStorage.getItem('petka_story_seen') === '1'; }catch(e){}
+    if(!storySeen) openStory();
 
     loadFromDB();
   </script>
