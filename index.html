@@ -585,6 +585,19 @@
     const PHOTO_TASK_ID = 6;
     let photoRows = [];
 
+    // všechny (i nepřímé) předchozí mise dané fáze podle grafu závislostí
+    function allPredecessors(id){
+      const acc = new Set();
+      (function walk(x){
+        for(const dep of (dependencies[x] || [])){
+          if(!acc.has(dep)){ acc.add(dep); walk(dep); }
+        }
+      })(id);
+      return acc;
+    }
+    // fáze, jejichž označení za NESPLNĚNÉ musí vynulovat fotky 6. mise (6 + její předchozí: 3, 1)
+    const PHOTO_RESET_TRIGGER_IDS = new Set([PHOTO_TASK_ID, ...allPredecessors(PHOTO_TASK_ID)]);
+
     async function loadPhotos(){
       const { data, error } = await sb
         .from('foto_ukol6')
@@ -809,6 +822,16 @@
         doneSet.delete(id);
       }
       normalizeDoneSet();
+
+      // Pokud byla 6. mise nebo některá její předchozí mise označena jako NESPLNĚNÁ,
+      // vynuluj všechny fotky 6. mise na FALSE (lokálně hned, do DB na pozadí).
+      let resetPhotosInDb = false;
+      if(!nowDone && PHOTO_RESET_TRIGGER_IDS.has(id) && photoRows.some(r => r.splneno)){
+        photoRows.forEach(r => r.splneno = false);
+        renderModalPhotos();
+        resetPhotosInDb = true;
+      }
+
       renderAll();
 
       // Uložení do Supabase (aktualizuj i všechny sousedy co mohly být odstraněny)
@@ -816,6 +839,13 @@
       sb.from('tasks').upsert(toUpdate).then(({ error }) => {
         if(error) console.error('Supabase save error:', error);
       });
+
+      if(resetPhotosInDb){
+        sb.from('foto_ukol6')
+          .update({ splneno: false, upraveno: new Date().toISOString() })
+          .gte('poradi', 0)
+          .then(({ error }) => { if(error) console.error('Supabase foto reset error:', error); });
+      }
 
     });
 
