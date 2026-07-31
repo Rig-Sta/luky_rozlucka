@@ -444,6 +444,8 @@
     </div>
   </div>
 
+  <div class="admin-hint" id="adminToggle" title="Klikni pro zadání hesla">🔒 Admin mód vypnut</div>
+
   <script>
     const SUPABASE_URL = 'https://okukscxyoeipkqehppnb.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_DaVZxpDzA2c_b6FP4BLFWQ_aQUur5kg';
@@ -621,15 +623,38 @@
       return { total, checked, majority: total > 0 && checked > total / 2 };
     }
 
-    async function loadFromDB() {
-      const { data, error } = await sb.from('tasks').select('id, done');
-      if (error) { console.error('Supabase load error:', error); return; }
-      doneSet.clear();
-      for (const row of data) {
-        if (row.done) doneSet.add(row.id);
+    function showDbError(err){
+      let bar = document.getElementById('dbErrorBar');
+      if(!bar){
+        bar = document.createElement('div');
+        bar.id = 'dbErrorBar';
+        bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:50;background:#3a1c22;color:#ffd9d9;border-bottom:1px solid #7a2f3a;font-size:13px;line-height:1.4;padding:10px 16px;text-align:center;font-family:inherit';
+        document.body.appendChild(bar);
       }
-      await loadPhotos();
-      renderAll();
+      const msg = (err && (err.message || err.error_description || err.hint)) || 'neznámá chyba';
+      bar.textContent = '⚠️ Nepodařilo se načíst data z databáze (' + msg + '). Stránka běží dál, ale změny se nemusí ukládat. Zkontroluj, zda není projekt v Supabase pozastavený. ';
+      const hide = document.createElement('span');
+      hide.textContent = 'Skrýt';
+      hide.style.cssText = 'cursor:pointer;text-decoration:underline;margin-left:6px';
+      hide.onclick = () => bar.remove();
+      bar.appendChild(hide);
+    }
+
+    async function loadFromDB() {
+      try {
+        const { data, error } = await sb.from('tasks').select('id, done');
+        if (error) throw error;
+        doneSet.clear();
+        for (const row of data) {
+          if (row.done) doneSet.add(row.id);
+        }
+        await loadPhotos();
+      } catch (err) {
+        console.error('Supabase load error:', err);
+        showDbError(err);
+      } finally {
+        renderAll();   // vždy vykresli UI, i když je databáze nedostupná
+      }
     }
 
 
@@ -953,8 +978,6 @@
 
     loadFromDB();
   </script>
-
-  <div class="admin-hint" id="adminToggle" title="Klikni pro zadání hesla">🔒 Admin mód vypnut</div>
 
 </body>
 </html>
